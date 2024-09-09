@@ -1,0 +1,39 @@
+name: Build and test
+on: push
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.com/winny/pre-commit-docker:latest
+      env:
+        PRE_COMMIT_HOME: .pre-commit-cache
+    steps:
+      - uses: actions/checkout@v4
+      - name: Allow workspace
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Cache .pre-commit-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .pre-commit-cache
+          key: ${{ runner.os }}-pre-commit-cache-${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Run pre-commit
+        run: pre-commit run -a
+
+
+  build:
+    # See https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-go
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+      - name: Install dependencies
+        run: go get .
+      - name: Build
+        run: go build -v ./...
+      - name: Test with the Go CLI
+        run: go test
