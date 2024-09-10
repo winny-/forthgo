@@ -35,6 +35,7 @@ func (word NumberWord) code() UserDefinedWordFunction {
 		return ctx.push(word.number)
 	}
 }
+
 func (word UserDefinedWord) code() UserDefinedWordFunction {
 	return word.function
 }
@@ -172,7 +173,7 @@ func makeContext() *Context {
 	ctx.defineBinaryWord("and", "conjunction", func(ctx *Context, a, b int) error {
 		return ctx.push(bool2int(int2bool(a) && int2bool(b)))
 	})
-	ctx.defineBinaryWord("or", "conjunction", func(ctx *Context, a, b int) error {
+	ctx.defineBinaryWord("or", "disjunction", func(ctx *Context, a, b int) error {
 		return ctx.push(bool2int(int2bool(a) || int2bool(b)))
 	})
 	ctx.definePrimitiveWord("invert", "negate", 1, func(ctx *Context, inputs []int) error {
